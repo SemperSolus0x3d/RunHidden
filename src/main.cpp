@@ -23,12 +23,19 @@ int wmain(int argc, wchar_t** argv)
     return _wsystem(command.c_str());
 }
 
+bool ContainsArgumentSeparator(wchar_t* str)
+{
+    return
+        wcschr(str, L' ') != NULL ||
+        wcschr(str, L'\t') != NULL;
+}
+
 std::wstring GetCommand(wchar_t** args, int begin, int length)
 {
     std::wstringstream stream;
 
     for (int i = begin; i < length; i++)
-        if (wcschr(args[i], L' ') != NULL)
+        if (ContainsArgumentSeparator(args[i]))
             stream << L'\"' << args[i] << L"\" ";
         else
             stream << args[i] << L' ';

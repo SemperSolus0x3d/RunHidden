@@ -13,6 +13,7 @@ public:
     Program(int argc, wchar_t** argv);
     ~Program();
     void Run();
+    void Stop();
 private:
     CommandLineArgs m_Args;
     STARTUPINFOW m_StartupInfo;

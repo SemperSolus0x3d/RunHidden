@@ -42,6 +42,11 @@ void Program::Run()
         future.wait();
 }
 
+void Program::Stop()
+{
+    TerminateJobObject(m_Job, 0);
+}
+
 void Program::ParseCommandLineArgs(int argc, wchar_t** argv)
 {
     using namespace std::string_literals;

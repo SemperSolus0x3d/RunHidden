@@ -27,7 +27,8 @@ void Program::Run()
 {
     using namespace std::string_literals;
 
-    ShowWindow(GetConsoleWindow(), SW_HIDE);
+    if (!m_Args.DoNotHideConsole)
+        ShowWindow(GetConsoleWindow(), SW_HIDE);
 
     CreateChildProcess();
 
@@ -90,6 +91,10 @@ void Program::ParseCommandLineArgs(int argc, wchar_t** argv)
         {
             PrintHelp();
         }
+        else if (arg == L"--no-hide")
+        {
+            m_Args.DoNotHideConsole = true;
+        }
         else if (arg == L"--")
         {
             for (int j = i + 1; j < argc; j++)
@@ -127,6 +132,7 @@ void Program::PrintHelp()
         << L" -i FILE       Read data from FILE and pass it to child process stdin." << std::endl
         << L"               Special value '-' can be used to pass RunHidden stdin to" << std::endl
         << L"               child process stdin" << std::endl
+        << L" --no-hide     Do not hide the console window (useful for debugging)" << std::endl
         << std::endl
         << L" --            Do not treat any more arguments as options." << std::endl
         << std::endl

@@ -10,4 +10,5 @@ public:
     std::wstring CommandLine;
     bool AppendStdoutFile = false;
     bool AppendStderrFile = false;
+    bool DoNotHideConsole = false;
 };

@@ -9,6 +9,11 @@ const ULONG_PTR CompletionKey = 52534;
 
 Program::Program(int argc, wchar_t** argv)
 {
+    // Workaround for Windows Terminal
+    // https://stackoverflow.com/questions/74681745/windows-terminal-minimizes-instead-of-hiding-when-using-sw-hide
+    SetForegroundWindow(GetConsoleWindow());
+    m_ConsoleWindowHandle = GetForegroundWindow();
+
     ParseCommandLineArgs(argc, argv);
     InitializeStartupInfo();
     InitializeProcessInfo();
@@ -23,24 +28,36 @@ Program::~Program()
     SafeCloseHandle(m_CompletionPort);
 }
 
-void Program::Run()
+int Program::Run()
 {
     using namespace std::string_literals;
 
-    if (!m_Args.DoNotHideConsole)
-        ShowWindow(GetConsoleWindow(), SW_HIDE);
+    try
+    {
+        if (!m_Args.DoNotHideConsole)
+            HideConsoleWindow();
 
-    CreateChildProcess();
+        CreateChildProcess();
 
-    AssignProcessToJobObject(m_Job, m_ProcessInfo.hProcess);
+        AssignProcessToJobObject(m_Job, m_ProcessInfo.hProcess);
 
-    auto futures = StartIoRedirection();
+        auto futures = StartIoRedirection();
 
-    ResumeThread(m_ProcessInfo.hThread);
-    WaitUntilClildProcessCompletes();
+        ResumeThread(m_ProcessInfo.hThread);
+        WaitUntilClildProcessCompletes();
 
-    for (auto& future : futures)
-        future.wait();
+        for (auto& future : futures)
+            future.wait();
+
+        return 0;
+    }
+    catch (const std::exception& ex)
+    {
+        ShowConsoleWindow();
+        std::wcout << L"Error: " << ex.what() << std::endl;
+        std::wcin.get();
+        return -1;
+    }
 }
 
 void Program::Stop()
@@ -298,4 +315,14 @@ std::vector<std::future<void>> Program::StartIoRedirection()
             futures.push_back(stream->CopyData());
 
     return futures;
+}
+
+void Program::HideConsoleWindow()
+{
+    ShowWindow(m_ConsoleWindowHandle, SW_HIDE);
+}
+
+void Program::ShowConsoleWindow()
+{
+    ShowWindow(m_ConsoleWindowHandle, SW_SHOW);
 }

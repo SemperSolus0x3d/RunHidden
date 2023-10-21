@@ -12,19 +12,8 @@ int wmain(int argc, wchar_t** argv)
 {
     SetConsoleCtrlHandler(&HandleCtrlEvent, TRUE);
 
-    try
-    {
-        ProgramPtr = std::make_shared<Program>(argc, argv);
-        ProgramPtr->Run();
-        return 0;
-    }
-    catch (const std::exception& ex)
-    {
-        ShowWindow(GetConsoleWindow(), SW_SHOW);
-        std::wcout << L"Error: " << ex.what() << std::endl;
-        std::wcin.get();
-        return -1;
-    }
+    ProgramPtr = std::make_shared<Program>(argc, argv);
+    return ProgramPtr->Run();
 }
 
 BOOL WINAPI HandleCtrlEvent(_In_ DWORD ctrlType)

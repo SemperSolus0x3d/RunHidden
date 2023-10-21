@@ -12,7 +12,7 @@ class Program
 public:
     Program(int argc, wchar_t** argv);
     ~Program();
-    void Run();
+    int Run();
     void Stop();
 private:
     CommandLineArgs m_Args;
@@ -20,6 +20,7 @@ private:
     PROCESS_INFORMATION m_ProcessInfo;
     HANDLE m_Job;
     HANDLE m_CompletionPort;
+    HWND m_ConsoleWindowHandle;
 
     std::shared_ptr<Stream> m_StdoutStream;
     std::shared_ptr<Stream> m_StderrStream;
@@ -33,4 +34,6 @@ private:
     void CreateChildProcess();
     void WaitUntilClildProcessCompletes();
     std::vector<std::future<void>> StartIoRedirection();
+    void HideConsoleWindow();
+    void ShowConsoleWindow();
 };
